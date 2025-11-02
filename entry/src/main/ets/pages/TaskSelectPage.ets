@@ -6,9 +6,9 @@ import { Constants } from '../common/Constants';
 
 @Component
 export struct TaskSelectPage {
-  @Param selectedTasks: string[] = [];
-  @Link onClose: () => void;
-  @Link onConfirm: (taskIds: string[]) => void;
+  @Prop selectedTasks: string[] = [];
+  onClose?: () => void;
+  onConfirm?: (taskIds: string[]) => void;
   
   @State selectedTaskIds: string[] = [];
   
@@ -238,7 +238,7 @@ export struct TaskSelectPage {
       [TaskType.MATH]: Color.Blue,
       [TaskType.MEMORY]: Color.Green,
       [TaskType.BARCODE]: Color.Orange,
-      [TaskType.SHAKE]: Color.Purple,
+      [TaskType.SHAKE]: '#AF52DE', // Purple color
       [TaskType.PHOTO]: Color.Pink
     };
     return colors[type] || $r('app.color.card_background');

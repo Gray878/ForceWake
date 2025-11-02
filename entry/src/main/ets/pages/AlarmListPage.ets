@@ -102,7 +102,7 @@ export struct AlarmListPage {
       if (this.showAddEditPage) {
         // 显示新增/编辑页面
         AddEditAlarmPage({
-          alarm: this.editingAlarm,
+          alarm: this.editingAlarm ?? undefined,
           onClose: () => {
             this.onCloseAddEditPage();
           },

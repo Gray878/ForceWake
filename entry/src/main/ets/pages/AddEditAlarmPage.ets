@@ -8,9 +8,9 @@ import { TaskSelectPage } from './TaskSelectPage';
 
 @Component
 export struct AddEditAlarmPage {
-  @Param alarm?: Alarm;
-  @Link onClose: () => void;
-  @Link onSave: (alarm: Alarm) => void;
+  @Prop alarm?: Alarm;
+  onClose?: () => void;
+  onSave?: (alarm: Alarm) => void;
   
   @State hour: number = 7;
   @State minute: number = 0;
@@ -116,9 +116,8 @@ export struct AddEditAlarmPage {
           
           // 时间选择器
           Row() {
-            TimePicker({
-              selected: { hour: this.hour, minute: this.minute }
-            })
+            TimePicker()
+              .selected(this.createTimePickerDate())
               .onChange((value: TimePickerResult) => {
                 this.hour = value.hour;
                 this.minute = value.minute;
@@ -335,6 +334,15 @@ export struct AddEditAlarmPage {
     .width('100%')
     .height('100%')
     .backgroundColor($r('app.color.background'))
+  }
+  
+  private createTimePickerDate(): Date {
+    const date = new Date();
+    date.setHours(this.hour);
+    date.setMinutes(this.minute);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+    return date;
   }
   
   private calculateNextRingTime(): string {
