@@ -121,20 +121,30 @@ export struct AlarmListPage {
   
   @Builder
   AlarmListView() {
-    Stack() {
+    Stack({ alignContent: Alignment.BottomEnd }) {
       Column() {
         // 顶部：下次闹钟信息
         Column() {
-          Button($r('app.string.next_alarm') + ' >')
-            .type(ButtonType.Normal)
-            .fontSize(14)
-            .fontColor($r('app.color.text_primary'))
-            .backgroundColor(Color.Transparent)
-            .border({ width: 1, color: $r('app.color.text_secondary') })
-            .borderRadius(8)
-            .padding({ left: 12, right: 12, top: 6, bottom: 6 })
-            .alignSelf(ItemAlign.Start)
-            .margin({ left: 16, top: 16 })
+          Button() {
+            Row() {
+              Text($r('app.string.next_alarm'))
+                .fontSize(14)
+                .fontColor($r('app.color.text_primary'))
+              Text(' >')
+                .fontSize(14)
+                .fontColor($r('app.color.text_primary'))
+            }
+          }
+          .type(ButtonType.Normal)
+          .backgroundColor(Color.Transparent)
+          .border({ width: 1, color: $r('app.color.text_secondary') })
+          .borderRadius(8)
+          .padding({ left: 12, right: 12, top: 6, bottom: 6 })
+          .alignSelf(ItemAlign.Start)
+          .margin({ left: 16, top: 16 })
+          .onClick(() => {
+            // 可以添加跳转逻辑
+          })
           
           Text(this.nextAlarmText)
             .fontSize(16)
@@ -178,12 +188,12 @@ export struct AlarmListPage {
         Text('+')
           .fontSize(32)
           .fontColor(Color.White)
+          .fontWeight(FontWeight.Normal)
       }
       .type(ButtonType.Circle)
       .width(56)
       .height(56)
       .backgroundColor($r('app.color.primary'))
-      .position({ x: '100%', y: '100%' })
       .margin({ right: 16, bottom: 80 })
       .onClick(() => {
         this.onAddAlarm();

@@ -24,7 +24,27 @@ export struct AddEditAlarmPage {
   @State showTaskSelect: boolean = false;
   @State isDaily: boolean = false;
   
+  // 小时和分钟范围
+  private hourRange: string[] = [];
+  private minuteRange: string[] = [];
+  
+  // 滚动控制器
+  private hourScroller: Scroller = new Scroller();
+  private minuteScroller: Scroller = new Scroller();
+  
+  private initRanges() {
+    // 初始化小时范围 00-23
+    for (let i = 0; i < 24; i++) {
+      this.hourRange.push(i.toString().padStart(2, '0'));
+    }
+    // 初始化分钟范围 00-59
+    for (let i = 0; i < 60; i++) {
+      this.minuteRange.push(i.toString().padStart(2, '0'));
+    }
+  }
+  
   aboutToAppear() {
+    this.initRanges();
     if (this.alarm) {
       // 编辑模式：加载已有数据
       this.hour = this.alarm.hour;
@@ -114,14 +134,59 @@ export struct AddEditAlarmPage {
             .fontColor($r('app.color.text_secondary'))
             .margin({ top: 16, bottom: 24 })
           
-          // 时间选择器
+          // 时间选择器 - 使用滚动列表
           Row() {
-            TimePicker()
-              .selected(this.createTimePickerDate())
-              .onChange((value: TimePickerResult) => {
-                this.hour = value.hour;
-                this.minute = value.minute;
-              })
+            // 小时选择
+            Column() {
+              List({ scroller: this.hourScroller }) {
+                ForEach(this.hourRange, (item: string, index: number) => {
+                  ListItem() {
+                    Text(item)
+                      .fontSize(24)
+                      .fontColor(this.hour === index ? $r('app.color.text_primary') : $r('app.color.text_secondary'))
+                      .fontWeight(this.hour === index ? FontWeight.Bold : FontWeight.Normal)
+                      .width('100%')
+                      .textAlign(TextAlign.Center)
+                      .padding({ top: 8, bottom: 8 })
+                      .onClick(() => {
+                        this.hour = index;
+                      })
+                  }
+                }, (item: string, index: number) => `${index}`)
+              }
+              .width(80)
+              .height(200)
+              .scrollBar(BarState.Auto)
+            }
+            
+            Text(':')
+              .fontSize(28)
+              .fontColor($r('app.color.text_primary'))
+              .fontWeight(FontWeight.Bold)
+              .margin({ left: 8, right: 8 })
+            
+            // 分钟选择
+            Column() {
+              List({ scroller: this.minuteScroller }) {
+                ForEach(this.minuteRange, (item: string, index: number) => {
+                  ListItem() {
+                    Text(item)
+                      .fontSize(24)
+                      .fontColor(this.minute === index ? $r('app.color.text_primary') : $r('app.color.text_secondary'))
+                      .fontWeight(this.minute === index ? FontWeight.Bold : FontWeight.Normal)
+                      .width('100%')
+                      .textAlign(TextAlign.Center)
+                      .padding({ top: 8, bottom: 8 })
+                      .onClick(() => {
+                        this.minute = index;
+                      })
+                  }
+                }, (item: string, index: number) => `${index}`)
+              }
+              .width(80)
+              .height(200)
+              .scrollBar(BarState.Auto)
+            }
           }
           .width('100%')
           .justifyContent(FlexAlign.Center)
@@ -334,15 +399,6 @@ export struct AddEditAlarmPage {
     .width('100%')
     .height('100%')
     .backgroundColor($r('app.color.background'))
-  }
-  
-  private createTimePickerDate(): Date {
-    const date = new Date();
-    date.setHours(this.hour);
-    date.setMinutes(this.minute);
-    date.setSeconds(0);
-    date.setMilliseconds(0);
-    return date;
   }
   
   private calculateNextRingTime(): string {
