@@ -163,6 +163,22 @@
     {
       "name": "about_us",
       "value": "关于我们"
+    },
+    {
+      "name": "camera_permission_reason",
+      "value": "需要相机权限以完成拍照任务"
+    },
+    {
+      "name": "media_permission_reason",
+      "value": "需要媒体权限以访问照片"
+    },
+    {
+      "name": "microphone_permission_reason",
+      "value": "需要麦克风权限以播放闹铃声音"
+    },
+    {
+      "name": "vibrate_permission_reason",
+      "value": "需要震动权限以提供震动反馈"
     }
   ]
 }

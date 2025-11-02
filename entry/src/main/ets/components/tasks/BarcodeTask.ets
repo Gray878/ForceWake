@@ -2,6 +2,10 @@
  * 条形码/二维码扫描任务组件
  */
 import { TaskConfig } from '../../model/Task';
+import { scan } from '@kit.ScanKit';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { common } from '@kit.AbilityKit';
+import { getContext } from '@kit.ArkUI';
 
 @Component
 export struct BarcodeTask {
@@ -12,30 +16,75 @@ export struct BarcodeTask {
   @State isScanning: boolean = false;
   @State targetValue: string = '';
   
+  private scanController: scan.ScanController | null = null;
+  
   aboutToAppear() {
     // 从配置中获取目标条形码值
     this.targetValue = this.taskConfig.barcodeValue || '';
   }
   
-  onStartScan() {
-    // TODO: 实现扫码功能
-    // 这里需要调用鸿蒙的扫码API
-    this.isScanning = true;
-    
-    // 模拟扫码结果（实际应该从扫码API获取）
-    setTimeout(() => {
-      // 假设扫描成功
-      const mockScannedValue = this.targetValue || '1234567890';
-      this.scannedValue = mockScannedValue;
-      this.isScanning = false;
-      
-      // 验证是否匹配
-      if (this.scannedValue === this.targetValue || this.targetValue === '') {
-        if (this.onComplete) {
-          this.onComplete();
-        }
+  aboutToDisappear() {
+    this.stopScan();
+  }
+  
+  async onStartScan() {
+    try {
+      const context = getContext(this) as common.UIAbilityContext;
+      if (!context) {
+        console.error('Context not available');
+        return;
       }
-    }, 2000);
+      
+      this.isScanning = true;
+      
+      // 创建扫码控制器
+      const scanConfig: scan.ScanConfig = {
+        scanTypes: [scan.ScanType.ALL], // 支持所有类型
+        resultType: scan.ScanResultType.STRING
+      };
+      
+      this.scanController = await scan.createScanController(context, scanConfig);
+      
+      // 注册扫码结果回调
+      this.scanController.on('result', (err: BusinessError, result: scan.ScanResult) => {
+        if (err) {
+          console.error('Scan error:', err);
+          this.isScanning = false;
+          return;
+        }
+        
+        if (result && result.value) {
+          this.scannedValue = result.value;
+          this.isScanning = false;
+          
+          // 验证是否匹配
+          if (this.targetValue === '' || this.scannedValue === this.targetValue) {
+            if (this.onComplete) {
+              this.onComplete();
+            }
+          }
+        }
+      });
+      
+      // 启动扫码
+      await this.scanController.startScan();
+      
+    } catch (error) {
+      console.error('Failed to start scan:', error);
+      this.isScanning = false;
+    }
+  }
+  
+  async stopScan() {
+    try {
+      if (this.scanController) {
+        await this.scanController.stopScan();
+        await this.scanController.destroy();
+        this.scanController = null;
+      }
+    } catch (error) {
+      console.error('Failed to stop scan:', error);
+    }
   }
   
   build() {

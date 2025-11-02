@@ -3,7 +3,7 @@
  * 使用Preference存储应用数据
  */
 import { preferences } from '@kit.ArkData';
-import { Context } from '@kit.AbilityKit';
+import { common } from '@kit.AbilityKit';
 import { Alarm } from '../model/Alarm';
 import { Constants } from '../common/Constants';
 import { SleepReminder } from '../model/SleepData';
@@ -11,7 +11,7 @@ import { SleepReminder } from '../model/SleepData';
 export class StorageManager {
   private static instance: StorageManager;
   private dataPreferences: preferences.Preferences | null = null;
-  private context: Context | null = null;
+  private context: common.Context | null = null;
   
   private constructor() {}
   
@@ -28,7 +28,7 @@ export class StorageManager {
   /**
    * 初始化Preference
    */
-  async init(context: Context): Promise<void> {
+  async init(context: common.Context): Promise<void> {
     this.context = context;
     try {
       this.dataPreferences = await preferences.getPreferences(context, 'alarm_data');

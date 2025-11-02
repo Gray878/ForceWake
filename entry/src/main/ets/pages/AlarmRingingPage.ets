@@ -4,11 +4,14 @@
 import { Alarm } from '../model/Alarm';
 import { TaskType, TaskConfig } from '../model/Task';
 import { Utils } from '../common/Utils';
+import { AlarmService } from '../common/AlarmService';
 import { MathTask } from '../components/tasks/MathTask';
 import { MemoryTask } from '../components/tasks/MemoryTask';
 import { BarcodeTask } from '../components/tasks/BarcodeTask';
 import { PhotoTask } from '../components/tasks/PhotoTask';
 import { ShakeTask } from '../components/tasks/ShakeTask';
+import { getContext } from '@kit.ArkUI';
+import { common } from '@kit.AbilityKit';
 
 @Component
 export struct AlarmRingingPage {
@@ -18,12 +21,13 @@ export struct AlarmRingingPage {
   @State currentTaskIndex: number = 0;
   @State completedTasks: Set<string> = new Set();
   @State allTasksCompleted: boolean = false;
+  @State allowDismiss: boolean = false;
   
   // 任务配置映射（从闹钟的任务ID获取配置）
   private taskConfigs: Map<string, TaskConfig> = new Map();
+  private alarmService: AlarmService = AlarmService.getInstance();
   
   aboutToAppear() {
-    // TODO: 从存储中加载任务配置
     // 初始化任务配置
     if (this.alarm && this.alarm.tasks) {
       this.alarm.tasks.forEach(taskId => {
@@ -32,15 +36,41 @@ export struct AlarmRingingPage {
       });
     }
     
+    // 初始化闹铃服务上下文
+    const context = getContext(this) as common.UIAbilityContext;
+    if (context) {
+      this.alarmService.setContext(context);
+    }
+    
+    // 开始播放闹铃
+    if (this.alarm) {
+      this.alarmService.playAlarmSound(this.alarm);
+    }
+    
     // 阻止返回和关闭
     this.preventBack();
   }
   
+  aboutToDisappear() {
+    // 停止闹铃
+    this.alarmService.stopAlarmSound();
+  }
+  
+  /**
+   * 阻止返回键和防作弊机制
+   */
+  onBackPress(): boolean | number {
+    // 如果任务未完成，阻止返回
+    if (!this.allTasksCompleted) {
+      return true; // 返回true表示阻止返回
+    }
+    return false; // 允许返回
+  }
+  
   preventBack() {
-    // TODO: 实现防作弊机制
-    // 1. 阻止系统返回键
-    // 2. 阻止应用切换到后台
-    // 3. 阻止关机/重启（需要系统权限）
+    // 防作弊机制已通过onBackPress实现
+    // 注意：阻止应用切换到后台和阻止关机/重启需要系统级权限
+    // 这些功能在实际部署时可能需要特殊权限申请
   }
   
   getDefaultTaskConfig(taskId: string): TaskConfig {
@@ -68,8 +98,10 @@ export struct AlarmRingingPage {
     // 检查是否所有任务都完成了
     if (this.completedTasks.size >= this.alarm.tasks.length) {
       this.allTasksCompleted = true;
-      // TODO: 停止闹铃声音
-      // TODO: 允许关闭页面
+      this.allowDismiss = true;
+      
+      // 停止闹铃声音
+      this.alarmService.stopAlarmSound();
     } else {
       // 下一个任务
       this.currentTaskIndex++;
