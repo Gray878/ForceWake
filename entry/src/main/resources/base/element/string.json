@@ -1,0 +1,168 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "不许睡强制闹钟应用"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "强制唤醒闹钟应用"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "不许睡"
+    },
+    {
+      "name": "app_name",
+      "value": "不许睡"
+    },
+    {
+      "name": "alarm",
+      "value": "闹钟"
+    },
+    {
+      "name": "sleep",
+      "value": "睡眠"
+    },
+    {
+      "name": "morning",
+      "value": "早上"
+    },
+    {
+      "name": "report",
+      "value": "报告"
+    },
+    {
+      "name": "settings",
+      "value": "设置"
+    },
+    {
+      "name": "next_alarm",
+      "value": "下次闹钟"
+    },
+    {
+      "name": "add_alarm",
+      "value": "添加闹钟"
+    },
+    {
+      "name": "save",
+      "value": "保存"
+    },
+    {
+      "name": "cancel",
+      "value": "取消"
+    },
+    {
+      "name": "delete",
+      "value": "删除"
+    },
+    {
+      "name": "edit",
+      "value": "编辑"
+    },
+    {
+      "name": "alarm_task",
+      "value": "闹钟任务"
+    },
+    {
+      "name": "task",
+      "value": "任务"
+    },
+    {
+      "name": "sound",
+      "value": "声音"
+    },
+    {
+      "name": "volume",
+      "value": "音量"
+    },
+    {
+      "name": "vibration",
+      "value": "震动"
+    },
+    {
+      "name": "repeat",
+      "value": "重复"
+    },
+    {
+      "name": "once",
+      "value": "一次性"
+    },
+    {
+      "name": "daily",
+      "value": "每天"
+    },
+    {
+      "name": "preview",
+      "value": "预览"
+    },
+    {
+      "name": "wake_up_brain",
+      "value": "唤醒你的大脑"
+    },
+    {
+      "name": "wake_up_body",
+      "value": "唤醒你的身体"
+    },
+    {
+      "name": "math_problem",
+      "value": "数学题"
+    },
+    {
+      "name": "memory_game",
+      "value": "记忆游戏"
+    },
+    {
+      "name": "barcode_qrcode",
+      "value": "条形码/二维码"
+    },
+    {
+      "name": "shake",
+      "value": "甩甩"
+    },
+    {
+      "name": "take_photo",
+      "value": "拍照"
+    },
+    {
+      "name": "sleep_reminder",
+      "value": "提醒就寝时间"
+    },
+    {
+      "name": "track_sleep",
+      "value": "跟踪我的睡眠"
+    },
+    {
+      "name": "sleep_report",
+      "value": "我的睡眠报告"
+    },
+    {
+      "name": "wake_up_score",
+      "value": "我的起床得分"
+    },
+    {
+      "name": "morning_feeling",
+      "value": "早晨的感觉"
+    },
+    {
+      "name": "required_permissions",
+      "value": "必要的权限"
+    },
+    {
+      "name": "prevent_shutdown",
+      "value": "阻止关机"
+    },
+    {
+      "name": "general",
+      "value": "常规"
+    },
+    {
+      "name": "feedback",
+      "value": "问题反馈"
+    },
+    {
+      "name": "about_us",
+      "value": "关于我们"
+    }
+  ]
+}
