@@ -4,10 +4,22 @@ import { window } from '@kit.ArkUI';
 
 const DOMAIN = 0x0000;
 
+// 全局变量，用于存储当前要响铃的闹钟ID
+export let currentRingingAlarmId: string | null = null;
+
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
+    
+    // 检查是否是从提醒触发的启动
+    if (want.action === 'action.alarm.ring' && want.parameters) {
+      const alarmId = want.parameters['alarmId'] as string;
+      if (alarmId) {
+        currentRingingAlarmId = alarmId;
+        hilog.info(DOMAIN, 'testTag', 'Alarm triggered: %{public}s', alarmId);
+      }
+    }
   }
 
   onDestroy(): void {

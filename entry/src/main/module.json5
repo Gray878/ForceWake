@@ -88,6 +88,16 @@
           ],
           "when": "inuse"
         }
+      },
+      {
+        "name": "ohos.permission.PUBLISH_AGENT_REMINDER",
+        "reason": "需要通知权限以设置闹钟提醒",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
       }
     ]
   }

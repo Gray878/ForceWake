@@ -7,11 +7,13 @@ import { common } from '@kit.AbilityKit';
 import { Alarm } from '../model/Alarm';
 import { Constants } from '../common/Constants';
 import { SleepReminder } from '../model/SleepData';
+import { AlarmTriggerService } from '../common/AlarmTriggerService';
 
 export class StorageManager {
   private static instance: StorageManager;
   private dataPreferences: preferences.Preferences | null = null;
   private context: common.Context | null = null;
+  private alarmTriggerService: AlarmTriggerService = AlarmTriggerService.getInstance();
   
   private constructor() {}
   
@@ -32,6 +34,11 @@ export class StorageManager {
     this.context = context;
     try {
       this.dataPreferences = await preferences.getPreferences(context, 'alarm_data');
+      // 初始化闹钟触发服务
+      this.alarmTriggerService.setContext(context);
+      // 注册所有启用的闹钟
+      const alarms = await this.getAlarms();
+      await this.alarmTriggerService.registerAllAlarms(alarms);
     } catch (error) {
       console.error('Failed to init preferences:', error);
     }
@@ -87,7 +94,12 @@ export class StorageManager {
   async addAlarm(alarm: Alarm): Promise<boolean> {
     const alarms = await this.getAlarms();
     alarms.push(alarm);
-    return await this.saveAlarms(alarms);
+    const saved = await this.saveAlarms(alarms);
+    if (saved) {
+      // 注册系统提醒
+      await this.alarmTriggerService.registerAlarm(alarm);
+    }
+    return saved;
   }
   
   /**
@@ -98,7 +110,12 @@ export class StorageManager {
     const index = alarms.findIndex(a => a.id === alarm.id);
     if (index >= 0) {
       alarms[index] = alarm;
-      return await this.saveAlarms(alarms);
+      const saved = await this.saveAlarms(alarms);
+      if (saved) {
+        // 更新系统提醒（先取消旧提醒，再注册新提醒）
+        await this.alarmTriggerService.registerAlarm(alarm);
+      }
+      return saved;
     }
     return false;
   }
@@ -109,7 +126,12 @@ export class StorageManager {
   async deleteAlarm(alarmId: string): Promise<boolean> {
     const alarms = await this.getAlarms();
     const filtered = alarms.filter(a => a.id !== alarmId);
-    return await this.saveAlarms(filtered);
+    const saved = await this.saveAlarms(filtered);
+    if (saved) {
+      // 取消系统提醒
+      await this.alarmTriggerService.unregisterAlarm(alarmId);
+    }
+    return saved;
   }
   
   /**
