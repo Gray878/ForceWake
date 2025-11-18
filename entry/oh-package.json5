@@ -5,6 +5,9 @@
   "main": "",
   "author": "",
   "license": "",
-  "dependencies": {}
+  "dependencies": {
+    "@kit.SensorKit": "^1.0.0",
+    "@kit.NotificationManagerKit": "^1.0.0"
+  }
 }
 

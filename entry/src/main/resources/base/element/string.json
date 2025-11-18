@@ -179,6 +179,10 @@
     {
       "name": "vibrate_permission_reason",
       "value": "需要震动权限以提供震动反馈"
+    },
+    {
+      "name": "reminder_permission_reason",
+      "value": "需要提醒发布权限以设置闹钟提醒"
     }
   ]
 }
