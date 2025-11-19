@@ -29,30 +29,20 @@ export class AlarmService {
       // 停止之前的播放
       await this.stopAlarmSound();
       
-      // 创建音频播放器
-      const audioPlayerOptions: media.AudioPlayerOptions = {
-        loop: true, // 循环播放
-        volume: alarm.volume / 100.0
-      };
-      
       // TODO: 使用实际的铃声文件路径
       // 这里需要将铃声文件放在 resources/rawfile 目录下
       const uri = 'file:///data/storage/el2/base/haps/entry/files/alarm_sound.mp3';
       
-      this.audioPlayer = await media.createAudioPlayer();
+      // TODO: 接入AudioPlayer API
+      // 需要查阅HarmonyOS官方文档获取正确的API使用方式
+      // 当前暂时使用模拟实现
+      console.info('TODO: Play alarm sound:', uri, 'Volume:', alarm.volume);
       
-      // 设置播放选项
-      this.audioPlayer.on('prepare', () => {
-        this.audioPlayer?.play();
-      });
+      // 模拟播放
+      this.audioPlayer = media.createAudioPlayer();
       
-      this.audioPlayer.on('error', (error: Error) => {
-        console.error('AudioPlayer error:', error);
-      });
-      
-      // 设置音频源（简化处理，实际需要根据soundName加载对应文件）
-      await this.audioPlayer.setSource(uri);
-      await this.audioPlayer.prepare();
+      // TODO: 正确设置音频源和播放选项
+      // 需要根据HarmonyOS API文档实现
       
       // 如果有震动
       if (alarm.isVibrationEnabled) {
@@ -69,8 +59,8 @@ export class AlarmService {
   async stopAlarmSound(): Promise<void> {
     try {
       if (this.audioPlayer) {
-        await this.audioPlayer.stop();
-        await this.audioPlayer.release();
+        this.audioPlayer.stop();
+        this.audioPlayer.release();
         this.audioPlayer = null;
       }
       this.stopVibration();

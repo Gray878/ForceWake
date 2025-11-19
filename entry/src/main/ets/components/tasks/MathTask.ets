@@ -12,22 +12,21 @@ interface MathProblem {
 export struct MathTask {
   @Prop taskConfig: TaskConfig = {};
   onComplete?: () => void;
-  
   @State currentProblem: MathProblem | null = null;
   @State userAnswer: string = '';
   @State currentIndex: number = 0;
   @State totalCount: number = 3;
   @State isCompleted: boolean = false;
-  
+
   aboutToAppear() {
     this.totalCount = this.taskConfig.mathCount || 3;
     this.generateNextProblem();
   }
-  
+
   generateNextProblem() {
     const level = this.taskConfig.mathLevel || 1;
     let num1: number, num2: number, operator: string, answer: number;
-    
+
     if (level === 1) {
       // 简单：10以内加减法
       num1 = Math.floor(Math.random() * 10) + 1;
@@ -38,7 +37,9 @@ export struct MathTask {
       } else {
         // 确保结果为正
         if (num1 < num2) {
-          [num1, num2] = [num2, num1];
+          const temp = num1;
+          num1 = num2;
+          num2 = temp;
         }
         answer = num1 - num2;
       }
@@ -52,7 +53,9 @@ export struct MathTask {
           answer = num1 + num2;
         } else {
           if (num1 < num2) {
-            [num1, num2] = [num2, num1];
+            const temp = num1;
+            num1 = num2;
+            num2 = temp;
           }
           answer = num1 - num2;
         }
@@ -66,7 +69,7 @@ export struct MathTask {
       // 困难：包含除法
       const ops = ['+', '-', '×', '÷'];
       operator = ops[Math.floor(Math.random() * ops.length)];
-      
+
       if (operator === '÷') {
         num2 = Math.floor(Math.random() * 9) + 1;
         answer = Math.floor(Math.random() * 9) + 1;
@@ -85,17 +88,19 @@ export struct MathTask {
         answer = num1 - num2;
       }
     }
-    
+
     this.currentProblem = {
       question: `${num1} ${operator} ${num2} = ?`,
       answer: answer
     };
     this.userAnswer = '';
   }
-  
+
   onSubmit() {
-    if (!this.currentProblem) return;
-    
+    if (!this.currentProblem) {
+      return;
+    }
+
     const userAns = parseInt(this.userAnswer);
     if (userAns === this.currentProblem.answer) {
       // 答对了
@@ -115,7 +120,7 @@ export struct MathTask {
       this.userAnswer = '';
     }
   }
-  
+
   build() {
     Column() {
       if (this.isCompleted) {
@@ -129,14 +134,14 @@ export struct MathTask {
           .fontSize(14)
           .fontColor($r('app.color.text_secondary'))
           .margin({ top: 16, bottom: 24 })
-        
+
         // 题目
         Text(this.currentProblem?.question || '')
           .fontSize(32)
           .fontColor($r('app.color.text_primary'))
           .fontWeight(FontWeight.Bold)
           .margin({ bottom: 32 })
-        
+
         // 输入框
         TextInput({ placeholder: '输入答案', text: this.userAnswer })
           .type(InputType.Number)
@@ -152,7 +157,7 @@ export struct MathTask {
           .onSubmit(() => {
             this.onSubmit();
           })
-        
+
         // 提交按钮
         Button('提交')
           .type(ButtonType.Capsule)

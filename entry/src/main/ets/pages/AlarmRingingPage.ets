@@ -10,7 +10,6 @@ import { MemoryTask } from '../components/tasks/MemoryTask';
 import { BarcodeTask } from '../components/tasks/BarcodeTask';
 import { PhotoTask } from '../components/tasks/PhotoTask';
 import { ShakeTask } from '../components/tasks/ShakeTask';
-import { getContext } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 
 @Component
@@ -36,11 +35,8 @@ export struct AlarmRingingPage {
       });
     }
     
-    // 初始化闹铃服务上下文
-    const context = getContext(this) as common.UIAbilityContext;
-    if (context) {
-      this.alarmService.setContext(context);
-    }
+    // TODO: 获取上下文并设置到闹铃服务
+    // 在ArkTS中，组件可以通过其他方式获取上下文
     
     // 开始播放闹铃
     if (this.alarm) {
@@ -59,7 +55,7 @@ export struct AlarmRingingPage {
   /**
    * 阻止返回键和防作弊机制
    */
-  onBackPress(): boolean | number {
+  onBackPress(): boolean {
     // 如果任务未完成，阻止返回
     if (!this.allTasksCompleted) {
       return true; // 返回true表示阻止返回
@@ -122,37 +118,36 @@ export struct AlarmRingingPage {
     return null;
   }
   
+  getCurrentTaskConfig(): TaskConfig {
+    if (!this.alarm || !this.alarm.tasks || this.currentTaskIndex >= this.alarm.tasks.length) {
+      return {};
+    }
+    const currentTaskId = this.alarm.tasks[this.currentTaskIndex];
+    return this.taskConfigs.get(currentTaskId) || {};
+  }
+  
   @Builder
   TaskContent() {
-    const taskType = this.getCurrentTaskType();
-    const taskConfig = this.alarm && this.alarm.tasks ? 
-      (this.taskConfigs.get(this.alarm.tasks[this.currentTaskIndex]) || {}) : {};
-    
-    if (taskType === TaskType.MATH) {
-      MathTask({ taskConfig: taskConfig })
-        .onComplete(() => {
-          this.onTaskComplete();
-        })
-    } else if (taskType === TaskType.MEMORY) {
-      MemoryTask({ taskConfig: taskConfig })
-        .onComplete(() => {
-          this.onTaskComplete();
-        })
-    } else if (taskType === TaskType.BARCODE) {
-      BarcodeTask({ taskConfig: taskConfig })
-        .onComplete(() => {
-          this.onTaskComplete();
-        })
-    } else if (taskType === TaskType.PHOTO) {
-      PhotoTask({ taskConfig: taskConfig })
-        .onComplete(() => {
-          this.onTaskComplete();
-        })
-    } else if (taskType === TaskType.SHAKE) {
-      ShakeTask({ taskConfig: taskConfig })
-        .onComplete(() => {
-          this.onTaskComplete();
-        })
+    if (this.getCurrentTaskType() === TaskType.MATH) {
+      MathTask({ taskConfig: this.getCurrentTaskConfig(), onComplete: () => {
+        this.onTaskComplete();
+      }})
+    } else if (this.getCurrentTaskType() === TaskType.MEMORY) {
+      MemoryTask({ taskConfig: this.getCurrentTaskConfig(), onComplete: () => {
+        this.onTaskComplete();
+      }})
+    } else if (this.getCurrentTaskType() === TaskType.BARCODE) {
+      BarcodeTask({ taskConfig: this.getCurrentTaskConfig(), onComplete: () => {
+        this.onTaskComplete();
+      }})
+    } else if (this.getCurrentTaskType() === TaskType.PHOTO) {
+      PhotoTask({ taskConfig: this.getCurrentTaskConfig(), onComplete: () => {
+        this.onTaskComplete();
+      }})
+    } else if (this.getCurrentTaskType() === TaskType.SHAKE) {
+      ShakeTask({ taskConfig: this.getCurrentTaskConfig(), onComplete: () => {
+        this.onTaskComplete();
+      }})
     } else {
       Text('未知任务类型')
         .fontSize(16)

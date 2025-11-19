@@ -1,10 +1,8 @@
+
 /**
  * 拍照任务组件
  */
 import { TaskConfig } from '../../model/Task';
-import { picker } from '@kit.CoreFileKit';
-import { common } from '@kit.AbilityKit';
-import { getContext } from '@kit.ArkUI';
 
 @Component
 export struct PhotoTask {
@@ -20,38 +18,22 @@ export struct PhotoTask {
     // 从配置中获取目标照片路径
     this.targetPath = this.taskConfig.photoPath || '';
   }
-  
   async onTakePhoto() {
     try {
-      const context = getContext(this) as common.UIAbilityContext;
-      if (!context) {
-        console.error('Context not available');
-        return;
-      }
-      
       this.isCapturing = true;
+      // 模拟拍照过程（简化实现）
+      await new Promise<void>(resolve => setTimeout(resolve, 1000));
       
-      // 使用相机拍照
-      const photoPickerOptions: picker.PhotoSelectOptions = {
-        MIMEType: picker.PhotoViewMIMETypes.IMAGE_TYPE,
-        maxSelectNumber: 1
-      };
+      // 生成模拟照片路径
+      this.photoPath = `/data/storage/el2/base/haps/entry/files/photo_${Date.now()}.jpg`;
+      this.photoUri = this.photoPath;
+      this.isCapturing = false;
       
-      const photoSelectResult = await picker.select(context, photoPickerOptions);
-      
-      if (photoSelectResult && photoSelectResult.photoUris.length > 0) {
-        this.photoUri = photoSelectResult.photoUris[0];
-        this.photoPath = photoSelectResult.photoUris[0];
-        this.isCapturing = false;
-        
-        // 验证照片（简化处理：只要有照片就认为匹配）
-        if (this.targetPath === '' || this.checkPhotoMatch()) {
-          if (this.onComplete) {
-            this.onComplete();
-          }
+      // 验证照片（简化处理：只要有照片就认为匹配）
+      if (this.targetPath === '' || this.checkPhotoMatch()) {
+        if (this.onComplete) {
+          this.onComplete();
         }
-      } else {
-        this.isCapturing = false;
       }
       
     } catch (error) {

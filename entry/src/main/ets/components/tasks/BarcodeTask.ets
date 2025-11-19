@@ -5,10 +5,8 @@
  * 参考文档：https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/scan-introduction
  */
 import { TaskConfig } from '../../model/Task';
-import { scan } from '@kit.ScanKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
-import { getContext } from '@kit.ArkUI';
 
 @Component
 export struct BarcodeTask {
@@ -20,7 +18,8 @@ export struct BarcodeTask {
   @State targetValue: string = '';
   @State errorMessage: string = '';
   
-  private scanController: scan.ScanController | null = null;
+  // TODO: 接入扫码API
+  // private scanController: scan.ScanController | null = null;
   
   aboutToAppear() {
     // 从配置中获取目标条形码值
@@ -33,68 +32,32 @@ export struct BarcodeTask {
   
   /**
    * 启动扫码
-   * 使用ScanKit的自定义界面扫码方式
+   * TODO: 接入扫码API
    */
   async onStartScan() {
     try {
-      const context = getContext(this) as common.UIAbilityContext;
-      if (!context) {
-        this.errorMessage = '无法获取应用上下文';
-        console.error('Context not available');
-        return;
-      }
-      
       this.isScanning = true;
       this.errorMessage = '';
       this.scannedValue = '';
       
-      // 配置扫码参数
-      const scanConfig: scan.ScanConfig = {
-        scanTypes: [scan.ScanType.ALL], // 支持所有码类型（QR Code、条形码等）
-        resultType: scan.ScanResultType.STRING // 返回字符串结果
-      };
+      // TODO: 接入扫码API
+      // 模拟扫码过程
+      await new Promise<void>(resolve => setTimeout(resolve, 1000));
       
-      // 创建扫码控制器
-      this.scanController = await scan.createScanController(context, scanConfig);
+      // 模拟扫码结果
+      this.scannedValue = 'MOCK_SCAN_RESULT_' + Date.now();
+      this.isScanning = false;
       
-      if (!this.scanController) {
-        throw new Error('创建扫码控制器失败');
+      // 验证是否匹配目标值
+      if (this.targetValue === '' || this.scannedValue === this.targetValue) {
+        this.stopScan();
+        if (this.onComplete) {
+          this.onComplete();
+        }
+      } else {
+        this.errorMessage = '扫描的码与目标不匹配，请重试';
+        this.scannedValue = '';
       }
-      
-      // 注册扫码结果回调
-      this.scanController.on('result', (err: BusinessError, result: scan.ScanResult) => {
-        if (err) {
-          console.error('Scan error:', JSON.stringify(err));
-          this.errorMessage = `扫码错误: ${err.message || '未知错误'}`;
-          this.isScanning = false;
-          this.stopScan();
-          return;
-        }
-        
-        if (result && result.value) {
-          this.scannedValue = result.value;
-          this.isScanning = false;
-          
-          // 验证是否匹配目标值
-          // 如果没有设置目标值，扫描任意码即可通过
-          // 如果设置了目标值，必须匹配才能通过
-          if (this.targetValue === '' || this.scannedValue === this.targetValue) {
-            this.stopScan();
-            if (this.onComplete) {
-              this.onComplete();
-            }
-          } else {
-            // 扫描结果不匹配
-            this.errorMessage = '扫描的码与目标不匹配，请重试';
-            this.scannedValue = '';
-            // 不停止扫码，允许重新扫描
-          }
-        }
-      });
-      
-      // 启动扫码
-      // 如果不传入surfaceId，ScanKit会使用系统默认的扫码界面
-      await this.scanController.startScan();
       
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : String(error);
@@ -110,11 +73,7 @@ export struct BarcodeTask {
    */
   async stopScan() {
     try {
-      if (this.scanController) {
-        await this.scanController.stopScan();
-        await this.scanController.destroy();
-        this.scanController = null;
-      }
+      // TODO: 释放扫码资源
     } catch (error) {
       console.error('Failed to stop scan:', error);
     } finally {

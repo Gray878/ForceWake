@@ -9,7 +9,7 @@ import { AlarmRingingPage } from './AlarmRingingPage';
 import { BottomNavBar } from '../components/BottomNavBar';
 import { StorageManager } from '../database/StorageManager';
 import { Alarm } from '../model/Alarm';
-import { currentRingingAlarmId } from '../entryability/EntryAbility';
+import { getCurrentRingingAlarmId, clearCurrentRingingAlarmId } from '../entryability/EntryAbility';
 
 @Entry
 @Component
@@ -26,14 +26,15 @@ struct Index {
   }
   
   async checkAndShowAlarmRinging() {
-    if (currentRingingAlarmId) {
+    const alarmId = getCurrentRingingAlarmId();
+    if (alarmId) {
       const alarms = await this.storageManager.getAlarms();
-      const alarm = alarms.find(a => a.id === currentRingingAlarmId);
+      const alarm = alarms.find(a => a.id === alarmId);
       if (alarm) {
         this.ringingAlarm = alarm;
         this.showAlarmRinging = true;
         // 清除标记，避免下次进入时重复触发
-        currentRingingAlarmId = null;
+        clearCurrentRingingAlarmId();
       }
     }
   }

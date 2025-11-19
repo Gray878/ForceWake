@@ -59,7 +59,7 @@ export class StorageManager {
    * 获取所有闹钟
    */
   async getAlarms(): Promise<Alarm[]> {
-    if (!this.ensureInitialized()) {
+    if (!this.ensureInitialized() || !this.dataPreferences) {
       return [];
     }
     try {
@@ -75,7 +75,7 @@ export class StorageManager {
    * 保存所有闹钟
    */
   async saveAlarms(alarms: Alarm[]): Promise<boolean> {
-    if (!this.ensureInitialized()) {
+    if (!this.ensureInitialized() || !this.dataPreferences) {
       return false;
     }
     try {
@@ -138,7 +138,7 @@ export class StorageManager {
    * 获取睡眠提醒设置
    */
   async getSleepReminder(): Promise<SleepReminder> {
-    if (!this.ensureInitialized()) {
+    if (!this.ensureInitialized() || !this.dataPreferences) {
       return { isEnabled: false, hour: 23, minute: 0 };
     }
     try {
@@ -154,7 +154,7 @@ export class StorageManager {
    * 保存睡眠提醒设置
    */
   async saveSleepReminder(reminder: SleepReminder): Promise<boolean> {
-    if (!this.ensureInitialized()) {
+    if (!this.ensureInitialized() || !this.dataPreferences) {
       return false;
     }
     try {
@@ -170,13 +170,13 @@ export class StorageManager {
   /**
    * 获取通用设置
    */
-  async getSettings(): Promise<any> {
-    if (!this.ensureInitialized()) {
+  async getSettings(): Promise<Record<string, string | number | boolean>> {
+    if (!this.ensureInitialized() || !this.dataPreferences) {
       return {};
     }
     try {
       const settingsJson = await this.dataPreferences.get(Constants.STORAGE_KEY_SETTINGS, '{}');
-      return JSON.parse(settingsJson as string);
+      return JSON.parse(settingsJson as string) as Record<string, string | number | boolean>;
     } catch (error) {
       console.error('Failed to get settings:', error);
       return {};
@@ -186,8 +186,8 @@ export class StorageManager {
   /**
    * 保存通用设置
    */
-  async saveSettings(settings: any): Promise<boolean> {
-    if (!this.ensureInitialized()) {
+  async saveSettings(settings: Record<string, string | number | boolean>): Promise<boolean> {
+    if (!this.ensureInitialized() || !this.dataPreferences) {
       return false;
     }
     try {
