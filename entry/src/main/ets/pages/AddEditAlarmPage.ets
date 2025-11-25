@@ -2,6 +2,7 @@
  * 新增/编辑闹钟页面
  */
 import { Alarm } from '../model/Alarm';
+import { TaskConfig } from '../model/Task';
 import { Utils } from '../common/Utils';
 import { Constants } from '../common/Constants';
 import { TaskSelectPage } from './TaskSelectPage';
@@ -21,6 +22,7 @@ export struct AddEditAlarmPage {
   @State isVibrationEnabled: boolean = Constants.DEFAULT_VIBRATION;
   @State soundName: string = Constants.DEFAULT_SOUND;
   @State tasks: string[] = [];
+  @State taskConfigs: Record<string, TaskConfig> = {}; // 任务配置
   @State showTaskSelect: boolean = false;
   @State isDaily: boolean = false;
   
@@ -55,7 +57,22 @@ export struct AddEditAlarmPage {
       this.volume = this.alarm.volume;
       this.isVibrationEnabled = this.alarm.isVibrationEnabled;
       this.soundName = this.alarm.soundName;
-      this.tasks = [...this.alarm.tasks];
+      // 复制任务ID列表
+      this.tasks = [];
+      for (let i = 0; i < this.alarm.tasks.length; i++) {
+        this.tasks.push(this.alarm.tasks[i]);
+      }
+      // 加载任务配置（手动复制对象，遍历任务ID列表）
+      if (this.alarm.taskConfigs) {
+        this.taskConfigs = {};
+        // 遍历任务ID列表来复制配置
+        for (let i = 0; i < this.tasks.length; i++) {
+          const taskId = this.tasks[i];
+          if (this.alarm.taskConfigs[taskId]) {
+            this.taskConfigs[taskId] = this.alarm.taskConfigs[taskId];
+          }
+        }
+      }
       this.isDaily = this.repeatDays.length === 7;
     } else {
       // 新增模式：使用默认值
@@ -77,6 +94,7 @@ export struct AddEditAlarmPage {
       isVibrationEnabled: this.isVibrationEnabled,
       soundName: this.soundName,
       tasks: this.tasks,
+      taskConfigs: this.taskConfigs, // 保存任务配置
       createdAt: this.alarm?.createdAt || Date.now(),
       updatedAt: Date.now()
     };
@@ -373,11 +391,13 @@ export struct AddEditAlarmPage {
       if (this.showTaskSelect) {
         TaskSelectPage({
           selectedTasks: this.tasks,
+          selectedTaskConfigs: this.taskConfigs,
           onClose: () => {
             this.showTaskSelect = false;
           },
-          onConfirm: (taskIds: string[]) => {
+          onConfirm: (taskIds: string[], taskConfigs: Record<string, TaskConfig>) => {
             this.tasks = taskIds;
+            this.taskConfigs = taskConfigs; // 保存任务配置
             this.showTaskSelect = false;
           }
         })

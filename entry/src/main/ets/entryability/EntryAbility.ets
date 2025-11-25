@@ -5,7 +5,17 @@ import { window } from '@kit.ArkUI';
 const DOMAIN = 0x0000;
 
 // 全局变量，用于存储当前要响铃的闹钟ID
-export let currentRingingAlarmId: string | null = null;
+let currentRingingAlarmId: string | null = null;
+
+// 获取当前响铃的闹钟ID
+export function getCurrentRingingAlarmId(): string | null {
+  return currentRingingAlarmId;
+}
+
+// 清除当前响铃的闹钟ID
+export function clearCurrentRingingAlarmId(): void {
+  currentRingingAlarmId = null;
+}
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {

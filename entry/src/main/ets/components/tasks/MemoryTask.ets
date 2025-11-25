@@ -35,11 +35,12 @@ export struct MemoryTask {
       values.push(i);
       values.push(i);
     }
-    
     // 打乱顺序
     for (let i = values.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [values[i], values[j]] = [values[j], values[i]];
+      const temp = values[i];
+      values[i] = values[j];
+      values[j] = temp;
     }
     
     // 创建卡片

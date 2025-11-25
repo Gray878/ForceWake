@@ -1,6 +1,8 @@
 /**
  * 闹钟数据模型
  */
+import { TaskConfig } from './Task';
+
 export interface Alarm {
   id: string; // 唯一标识
   hour: number; // 小时 (0-23)
@@ -12,6 +14,7 @@ export interface Alarm {
   isVibrationEnabled: boolean; // 是否震动
   soundName: string; // 铃声名称
   tasks: string[]; // 绑定的任务ID列表
+  taskConfigs?: Record<string, TaskConfig>; // 任务配置映射，key为任务ID，value为任务配置
   createdAt: number; // 创建时间戳
   updatedAt: number; // 更新时间戳
 }

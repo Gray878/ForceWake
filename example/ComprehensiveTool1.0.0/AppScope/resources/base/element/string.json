@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "综合工具"
+    },
+    {
+      "name": "agcit_huawei_tools",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_tools",
+      "value": "industryTemplate"
+    },
+    {
+      "name": "agcitkid_huawei_tools",
+      "value": "agcit_huawei_calendar_calendar_almanac/1.0.1,agcit_huawei_calendar_date_calculation/1.0.1,agcit_huawei_calculator_module_standard_calculator/1.0.1,agcit_huawei_recipes_calorie_calculation/1.0.1,agcit_huawei_exchange_rate_calculator/1.0.0,agcit_huawei_individual_income_tax_calculator/1.0.0,agcit_huawei_mortgage_calculator/1.0.0,agcit_huawei_remote_control/1.0.0"
+    }
+  ]
+}

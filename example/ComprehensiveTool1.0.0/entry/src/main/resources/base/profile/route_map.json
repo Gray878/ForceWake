@@ -1,0 +1,52 @@
+{
+  "routerMap": [
+    {
+      "name": "PrivacyPolicyPage",
+      "pageSourceFile": "src/main/ets/pages/PrivacyPolicyPage.ets",
+      "buildFunction": "PrivacyPolicyPageBuilder",
+      "data": {
+        "description": "this is PrivacyPolicyPage"
+      }
+    },
+    {
+      "name": "TermsOfServicePage",
+      "pageSourceFile": "src/main/ets/pages/TermsOfServicePage.ets",
+      "buildFunction": "TermsOfServicePageBuilder",
+      "data": {
+        "description": "this is TermsOfServicePage"
+      }
+    },
+    {
+      "name": "Mine",
+      "pageSourceFile": "src/main/ets/pages/Mine.ets",
+      "buildFunction": "MineBuilder",
+      "data": {
+        "description": "this is Mine"
+      }
+    },
+    {
+      "name": "SubmitFeedBack",
+      "pageSourceFile": "src/main/ets/pages/SubmitFeedBack.ets",
+      "buildFunction": "SubmitFeedBackBuilder",
+      "data": {
+        "description": "this is SubmitFeedBack"
+      }
+    },
+    {
+      "name": "FeedBacks",
+      "pageSourceFile": "src/main/ets/pages/FeedBacks.ets",
+      "buildFunction": "FeedBacksBuilder",
+      "data": {
+        "description": "this is FeedBacks"
+      }
+    },
+    {
+      "name": "ToolManagement",
+      "pageSourceFile": "src/main/ets/pages/ToolManagement.ets",
+      "buildFunction": "ToolManagementBuilder",
+      "data": {
+        "description": "this is ToolManagement"
+      }
+    }
+  ]
+}
