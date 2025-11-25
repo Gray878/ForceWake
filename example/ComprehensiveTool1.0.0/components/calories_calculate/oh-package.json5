@@ -1,0 +1,12 @@
+{
+  "name": "calories_calculate",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@ohos/mpchart": "3.0.21",
+    "@ohos/axios": "^2.2.4"
+  }
+}

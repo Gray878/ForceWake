@@ -3,10 +3,12 @@
  * 
  * 使用HarmonyOS ScanKit实现扫码功能
  * 参考文档：https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/scan-introduction
+ * 参考示例：example/scan-kit_-sample-code_-clientdemo_-arkts
  */
 import { TaskConfig } from '../../model/Task';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
+import { scanBarcode, scanCore } from '@kit.ScanKit';
 
 @Component
 export struct BarcodeTask {
@@ -18,21 +20,19 @@ export struct BarcodeTask {
   @State targetValue: string = '';
   @State errorMessage: string = '';
   
-  // TODO: 接入扫码API
-  // private scanController: scan.ScanController | null = null;
-  
   aboutToAppear() {
     // 从配置中获取目标条形码值
     this.targetValue = this.taskConfig.barcodeValue || '';
   }
   
   aboutToDisappear() {
-    this.stopScan();
+    // 默认界面扫码由系统自动管理资源，无需手动释放
   }
   
   /**
    * 启动扫码
-   * TODO: 接入扫码API
+   * 使用ScanKit默认界面扫码功能
+   * 参考：example/scan-kit_-sample-code_-clientdemo_-arkts/entry/src/main/ets/pages/defaultScan/DefaultScan.ets
    */
   async onStartScan() {
     try {
@@ -40,45 +40,70 @@ export struct BarcodeTask {
       this.errorMessage = '';
       this.scannedValue = '';
       
-      // TODO: 接入扫码API
-      // 模拟扫码过程
-      await new Promise<void>(resolve => setTimeout(resolve, 1000));
+      // 获取页面上下文
+      const context = getContext(this) as common.UIAbilityContext;
+      if (!context) {
+        throw new Error('无法获取页面上下文');
+      }
       
-      // 模拟扫码结果
-      this.scannedValue = 'MOCK_SCAN_RESULT_' + Date.now();
-      this.isScanning = false;
+      // 调用ScanKit默认界面扫码API
+      // 参考官方示例：scanBarcode.startScanForResult()
+      const result: scanBarcode.ScanResult = await scanBarcode.startScanForResult(context, {
+        scanTypes: [scanCore.ScanType.ALL], // 支持所有码类型
+        enableMultiMode: false, // 单码模式，只返回第一个扫码结果
+        enableAlbum: false // 不启用相册入口
+      });
       
-      // 验证是否匹配目标值
-      if (this.targetValue === '' || this.scannedValue === this.targetValue) {
-        this.stopScan();
-        if (this.onComplete) {
-          this.onComplete();
+      // 处理扫码结果
+      if (result && result.originalValue) {
+        this.scannedValue = result.originalValue;
+        this.isScanning = false;
+        
+        // 验证是否匹配目标值
+        if (this.targetValue === '' || this.scannedValue === this.targetValue) {
+          // 匹配成功，完成任务
+          if (this.onComplete) {
+            this.onComplete();
+          }
+        } else {
+          // 不匹配，提示用户重试
+          this.errorMessage = '扫描的码与目标不匹配，请重试';
+          this.scannedValue = '';
         }
       } else {
-        this.errorMessage = '扫描的码与目标不匹配，请重试';
-        this.scannedValue = '';
+        // 扫码结果为空
+        this.isScanning = false;
+        this.errorMessage = '未获取到扫码结果，请重试';
       }
       
     } catch (error) {
-      const errMsg = error instanceof Error ? error.message : String(error);
-      console.error('Failed to start scan:', errMsg);
-      this.errorMessage = `启动扫码失败: ${errMsg}`;
       this.isScanning = false;
-      this.stopScan();
+      
+      // 处理错误
+      // BusinessError是类型而非类，不能使用instanceof，需要类型断言
+      const businessError = error as BusinessError;
+      
+      // 用户取消扫码
+      if (businessError.code === scanCore.ScanErrorCode.SCAN_SERVICE_CANCELED) {
+        console.info('用户取消了扫码');
+        // 用户取消不显示错误信息
+        return;
+      } else {
+        // 其他错误
+        const errMsg: string = businessError.message || `错误代码: ${businessError.code}`;
+        console.error('扫码失败:', errMsg);
+        this.errorMessage = `启动扫码失败: ${errMsg}`;
+      }
     }
   }
   
   /**
    * 停止扫码并释放资源
+   * 注意：使用默认界面扫码时，系统会自动管理资源，无需手动释放
    */
   async stopScan() {
-    try {
-      // TODO: 释放扫码资源
-    } catch (error) {
-      console.error('Failed to stop scan:', error);
-    } finally {
-      this.isScanning = false;
-    }
+    // 默认界面扫码由系统自动管理资源，无需手动释放
+    this.isScanning = false;
   }
   
   build() {

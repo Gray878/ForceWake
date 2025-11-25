@@ -1,0 +1,74 @@
+{
+  "app": {
+    "signingConfigs": [],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "targetSdkVersion": "5.0.5(17)",
+        "compatibleSdkVersion": "5.0.5(17)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug"
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "basic_calculator",
+      "srcPath": "./components/basic_calculator"
+    },
+    {
+      "name": "date_calculate",
+      "srcPath": "./components/date_calculate"
+    },
+    {
+      "name": "almanac",
+      "srcPath": "./components/almanac"
+    },
+    {
+      "name": "calories_calculate",
+      "srcPath": "./components/calories_calculate"
+    },
+    {
+      "name": "income_calculator",
+      "srcPath": "./components/income_calculator"
+    },
+    {
+      "name": "exchange_calculator",
+      "srcPath": "./components/exchange_calculator"
+    },
+    {
+      "name": "remote_control",
+      "srcPath": "./components/remote_control"
+    },
+    {
+      "name": "mortgage_calculator",
+      "srcPath": "./components/mortgage_calculator"
+    }
+  ]
+}

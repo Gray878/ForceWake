@@ -12,37 +12,51 @@
 
 ### 参考文档
 - [ScanKit 官方文档](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/scan-introduction)
+- [官方示例项目](example/scan-kit_-sample-code_-clientdemo_-arkts)
 
 ### 使用的API
 - `@kit.ScanKit` - 扫码能力包
-- `scan.createScanController()` - 创建扫码控制器
-- `scan.ScanController.on('result')` - 监听扫码结果
-- `scan.ScanController.startScan()` - 启动扫码（使用系统默认界面）
-- `scan.ScanController.stopScan()` - 停止扫码
-- `scan.ScanController.destroy()` - 销毁控制器
+- `scanBarcode.startScanForResult()` - 启动默认界面扫码（推荐方式）
+- `scanCore.ScanType` - 扫码类型枚举
+- `scanCore.ScanErrorCode` - 扫码错误码枚举
 
 ### 权限要求
 - `ohos.permission.CAMERA` - 相机权限（已在module.json5中配置）
 
 ### 实现方式
-采用ScanKit的**自定义界面扫码**方式：
-- 调用`scan.createScanController()`创建控制器
-- 调用`startScan()`启动扫码（不传入surfaceId时，系统会提供默认扫码界面）
-- 通过事件回调监听扫码结果
+采用ScanKit的**默认界面扫码**方式（推荐）：
+- 调用`scanBarcode.startScanForResult()`直接启动系统默认扫码界面
+- 系统自动管理扫码界面和资源生命周期
+- 通过Promise返回扫码结果，代码简洁高效
 
 ### 实现要点
-1. 使用`getContext(this)`获取页面上下文（`common.UIAbilityContext`）
-2. 创建`ScanConfig`配置扫码参数：
-   - `scanTypes: [scan.ScanType.ALL]` - 支持所有码类型（QR Code、条形码等）
-   - `resultType: scan.ScanResultType.STRING` - 返回字符串结果
-3. 注册`result`事件回调处理扫码结果
-4. 验证扫码结果是否匹配目标值：
-   - 如果未设置目标值（`targetValue === ''`），扫描任意码即可通过
-   - 如果设置了目标值，必须完全匹配才能通过
-5. 完善的错误处理：
-   - 捕获创建控制器异常
-   - 处理扫码过程中的错误
-   - 显示友好的错误提示
+1. **导入模块**：
+   ```typescript
+   import { scanBarcode, scanCore } from '@kit.ScanKit';
+   ```
+
+2. **获取页面上下文**：
+   ```typescript
+   const context = getContext(this) as common.UIAbilityContext;
+   ```
+
+3. **调用扫码API**：
+   ```typescript
+   const result = await scanBarcode.startScanForResult(context, {
+     scanTypes: [scanCore.ScanType.ALL], // 支持所有码类型
+     enableMultiMode: false, // 单码模式
+     enableAlbum: false // 不启用相册入口
+   });
+   ```
+
+4. **处理扫码结果**：
+   - `result.originalValue` - 扫码结果字符串
+   - `result.scanType` - 码类型
+   - 验证结果是否匹配目标值
+
+5. **错误处理**：
+   - `scanCore.ScanErrorCode.SCAN_SERVICE_CANCELED` - 用户取消扫码
+   - 其他错误需要提示用户
 
 ### 支持的码类型
 ScanKit支持以下码制式的识别：
@@ -58,36 +72,49 @@ ScanKit支持以下码制式的识别：
 - MULTIFUNCTIONAL CODE（仅识别）
 
 ### 注意事项
-1. **系统默认界面**：当不传入`surfaceId`调用`startScan()`时，ScanKit会打开系统默认的扫码界面，用户在该界面完成扫码后，结果会通过回调返回
-2. **资源释放**：在组件销毁时（`aboutToDisappear`）必须调用`stopScan()`和`destroy()`释放资源
+1. **系统默认界面**：`startScanForResult()`会自动打开系统默认的扫码界面，用户体验一致
+2. **资源管理**：系统自动管理扫码资源，无需手动释放，代码更简洁
 3. **权限检查**：确保已授予相机权限，否则扫码会失败
-4. **错误处理**：扫码失败时会通过回调返回错误，需要妥善处理并提示用户
+4. **错误处理**：用户取消扫码时不会抛出异常，返回`SCAN_SERVICE_CANCELED`错误码
+5. **异步处理**：扫码是异步操作，使用async/await或Promise处理结果
 
 ### 代码示例
 ```typescript
-// 创建扫码配置
-const scanConfig: scan.ScanConfig = {
-  scanTypes: [scan.ScanType.ALL],
-  resultType: scan.ScanResultType.STRING
-};
+// 获取页面上下文
+const context = getContext(this) as common.UIAbilityContext;
 
-// 创建控制器
-this.scanController = await scan.createScanController(context, scanConfig);
-
-// 注册结果回调
-this.scanController.on('result', (err: BusinessError, result: scan.ScanResult) => {
-  if (err) {
-    // 处理错误
-    return;
-  }
-  if (result && result.value) {
-    // 处理扫码结果
-  }
+// 调用默认界面扫码API
+const result: scanBarcode.ScanResult = await scanBarcode.startScanForResult(context, {
+  scanTypes: [scanCore.ScanType.ALL], // 支持所有码类型
+  enableMultiMode: false, // 单码模式，只返回第一个扫码结果
+  enableAlbum: false // 不启用相册入口
 });
 
-// 启动扫码（系统默认界面）
-await this.scanController.startScan();
+// 处理扫码结果
+if (result && result.originalValue) {
+  const scannedValue = result.originalValue;
+  // 验证是否匹配目标值
+  if (targetValue === '' || scannedValue === targetValue) {
+    // 匹配成功，完成任务
+  }
+}
+
+// 错误处理
+catch (error: BusinessError) {
+  if (error.code === scanCore.ScanErrorCode.SCAN_SERVICE_CANCELED) {
+    // 用户取消扫码，不显示错误
+  } else {
+    // 其他错误，提示用户
+  }
+}
 ```
+
+### 优势
+相比自定义界面扫码方式，默认界面扫码具有以下优势：
+1. **代码简洁**：无需创建控制器、注册回调、手动释放资源
+2. **系统管理**：扫码界面和资源由系统自动管理
+3. **用户体验**：使用系统统一的扫码界面，体验一致
+4. **维护成本低**：代码量少，出错概率低
 
 ---
 
