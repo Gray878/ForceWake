@@ -30,8 +30,14 @@ export struct AlarmRingingPage {
     // 初始化任务配置
     if (this.alarm && this.alarm.tasks) {
       this.alarm.tasks.forEach(taskId => {
-        // 根据任务ID获取配置（这里简化处理）
-        this.taskConfigs.set(taskId, this.getDefaultTaskConfig(taskId));
+        // 优先从Alarm的taskConfigs中读取配置，如果没有则使用默认配置
+        let config: TaskConfig = {};
+        if (this.alarm && this.alarm.taskConfigs && this.alarm.taskConfigs[taskId]) {
+          config = this.alarm.taskConfigs[taskId];
+        } else {
+          config = this.getDefaultTaskConfig(taskId);
+        }
+        this.taskConfigs.set(taskId, config);
       });
     }
     

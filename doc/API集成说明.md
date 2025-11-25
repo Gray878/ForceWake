@@ -118,7 +118,7 @@ catch (error: BusinessError) {
 
 ---
 
-## 2. 相机API集成（CoreFileKit）
+## 2. 相机API集成（MediaLibraryKit）
 
 ### 功能
 实现拍照任务（PhotoTask）
@@ -126,19 +126,88 @@ catch (error: BusinessError) {
 ### 实现位置
 `entry/src/main/ets/components/tasks/PhotoTask.ets`
 
+### 参考文档
+- [MediaLibraryKit 官方文档](https://developer.huawei.com/consumer/cn/doc/harmonyos-references/js-apis-photoAccessHelper)
+- 参考示例：`example/ComprehensiveTool1.0.0/entry/src/main/ets/utils/FileSelect.ets`
+
 ### 使用的API
-- `@kit.CoreFileKit` - 文件能力包
-- `picker.PhotoSelectOptions` - 照片选择选项
-- `picker.select()` - 选择照片
+- `@kit.MediaLibraryKit` - 媒体库能力包
+- `photoAccessHelper.PhotoViewPicker` - 图片选择器
+- `photoAccessHelper.PhotoSelectOptions` - 照片选择选项
+- `photoPicker.select()` - 选择照片（支持拍照和相册选择）
 
 ### 权限要求
-- `ohos.permission.CAMERA` - 相机权限
+- `ohos.permission.CAMERA` - 相机权限（已在module.json5中配置）
 - `ohos.permission.READ_MEDIA` - 媒体读取权限（已在module.json5中配置）
 
+### 实现方式
+采用MediaLibraryKit的**图片选择器**方式：
+- 使用`PhotoViewPicker`创建图片选择器
+- 配置`PhotoSelectOptions`设置选择参数
+- 调用`select()`方法打开图片选择界面
+- 用户可以选择拍照或从相册选择图片
+
 ### 实现要点
-1. 使用照片选择器而非直接调用相机（更符合HarmonyOS规范）
-2. 处理用户取消选择的情况
-3. 验证照片（当前简化处理，后续可接入图像识别）
+1. **创建选择选项**：
+   ```typescript
+   let photoSelectOptions = new photoAccessHelper.PhotoSelectOptions();
+   photoSelectOptions.MIMEType = photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE;
+   photoSelectOptions.maxSelectNumber = 1; // 最多选择1张
+   ```
+
+2. **创建选择器并调用**：
+   ```typescript
+   let photoPicker = new photoAccessHelper.PhotoViewPicker();
+   let photoSelectResult = await photoPicker.select(photoSelectOptions);
+   ```
+
+3. **处理选择结果**：
+   - 检查`photoSelectResult.photoUris`是否为空
+   - 验证URI格式（`media/Photo`或`file://`）
+   - 保存照片路径到`photoPath`和`photoUri`
+
+4. **用户取消处理**：
+   - 如果用户取消选择，`photoSelectResult`可能为空或`photoUris`为空
+   - 不显示错误信息，静默处理
+
+5. **照片验证**：
+   - 当前简化处理：只要有照片就认为匹配
+   - 后续可接入图像识别API进行相似度比较
+
+### 优势
+相比直接调用相机API，图片选择器方式具有以下优势：
+1. **用户体验好**：用户可以选择拍照或从相册选择，更灵活
+2. **代码简洁**：无需管理相机预览、拍照会话等复杂逻辑
+3. **系统管理**：图片选择界面由系统提供，体验一致
+4. **权限处理**：系统自动处理权限申请
+
+### 代码示例
+```typescript
+// 设置图片选择选项
+let photoSelectOptions = new photoAccessHelper.PhotoSelectOptions();
+photoSelectOptions.MIMEType = photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE;
+photoSelectOptions.maxSelectNumber = 1;
+
+// 创建图片选择器
+let photoPicker = new photoAccessHelper.PhotoViewPicker();
+
+// 选择图片（用户可以选择拍照或从相册选择）
+let photoSelectResult = await photoPicker.select(photoSelectOptions);
+
+// 处理结果
+if (photoSelectResult && photoSelectResult.photoUris && photoSelectResult.photoUris.length > 0) {
+  const selectedUri = photoSelectResult.photoUris[0];
+  // 保存照片路径
+  this.photoPath = selectedUri;
+  this.photoUri = selectedUri;
+}
+```
+
+### 注意事项
+1. **URI格式**：选择器返回的URI格式可能是`media/Photo`或`file://`，需要验证
+2. **用户取消**：用户取消选择时，`photoSelectResult`可能为空，需要妥善处理
+3. **权限检查**：确保已授予相机和媒体读取权限
+4. **图片验证**：当前简化处理，后续可接入图像识别API
 
 ---
 
